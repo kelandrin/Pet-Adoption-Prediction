@@ -1,0 +1,130 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+
+
+```{r}
+cat_training_data<- read.csv("~/Desktop/petfinder-adoption-prediction/all/cat_training_data.csv")
+cat_valiation_data<-read.csv("~/Desktop/petfinder-adoption-prediction/all/cat_valiation_data.csv")
+cat_test_data<-read.csv("~/Desktop/petfinder-adoption-prediction/all/cat_test_data.csv")
+View(cat_training_data)
+View(cat_valiation_data)
+```
+
+```{r}
+#library(dplyr)
+trainingcat <- cat_training_data %>%
+  dplyr::select(-c(X, Unnamed..0,  PhotoAmt, Fee,PetID,Emotion,Breed))
+trainingcat
+```
+
+```{r}
+testcat <- cat_valiation_data %>%
+  dplyr::select(-c(X, Unnamed..0,  PhotoAmt, Fee,PetID,Emotion,Breed))
+testcat
+
+testcat1 <- cat_test_data %>%
+  dplyr::select(-c(X, Unnamed..0,  PhotoAmt, Fee,PetID,Emotion,Breed))
+testcat1
+
+
+```
+
+```{r}
+library(nnet)
+attach(trainingcat)
+names(trainingcat)
+mulitnomModelCat <- multinom(AdoptionSpeed ~ ., data = trainingcat)
+summary(mulitnomModelCat)
+```
+
+```{r}
+predictioncat <- predict(mulitnomModelCat, testcat)
+#predictioncat
+table(predictioncat, testcat$AdoptionSpeed)
+mean(as.character(predictioncat) != as.character(testcat$AdoptionSpeed))
+
+predictioncat1 <- predict(mulitnomModelCat, testcat1)
+#predictioncat
+table(predictioncat1, testcat1$AdoptionSpeed)
+mean(as.character(predictioncat1) != as.character(testcat1$AdoptionSpeed))
+
+
+```
+
+
+```{r}
+QCats<-data.frame(cat_valiation_data$PetID,predictioncat,cat_valiation_data$AdoptionSpeed)
+QCats
+write.csv(QCats, "~/Desktop/petfinder-adoption-prediction/all/Qcats.csv")
+
+
+QQCats<-data.frame(cat_test_data$PetID,predictioncat1,cat_test_data$AdoptionSpeed)
+QQCats
+write.csv(QQCats, "~/Desktop/petfinder-adoption-prediction/all/QQcats.csv")
+```
+
+```{r}
+dog_training_data<- read.csv("~/Desktop/petfinder-adoption-prediction/all/dog_training_data.csv")
+#View(dog_training_data)
+
+dog_valiation_data<- read.csv("~/Desktop/petfinder-adoption-prediction/all/dog_valiation_data.csv")
+#View(dog_valiation_data)
+
+dog_test_data<- read.csv("~/Desktop/petfinder-adoption-prediction/all/dog_test_data.csv")
+#View(dog_test_data)
+
+dog<-dog_training_data 
+dog<-select(dog_training_data , -c(X, Unnamed..0,  PhotoAmt, Fee,PetID,Emotion,Breed))
+View(dog)
+
+
+dog_training_datalm<-lm(AdoptionSpeed ~ ., data = dog)
+
+attach(dog)
+
+library(dplyr)
+trainingdog <- dog_training_data %>%
+  dplyr::select(-c(X, Unnamed..0,  PhotoAmt, Fee,PetID,Emotion,Breed))
+trainingdog
+
+testdog <- dog_valiation_data %>%
+  dplyr::select(-c(X, Unnamed..0,  PhotoAmt, Fee,PetID,Emotion,Breed))
+testdog
+
+testdog1 <- dog_test_data %>%
+  dplyr::select(-c(X, Unnamed..0,  PhotoAmt, Fee,PetID,Emotion,Breed))
+testdog1
+
+library(nnet)
+attach(trainingdog)
+names(trainingdog)
+
+
+mulitnomModeldog <- multinom(AdoptionSpeed ~ ., data = trainingdog)
+predictiondog <- predict(mulitnomModeldog, testdog)
+
+
+predictiondog
+
+predictiondog1 <- predict(mulitnomModeldog, testdog1)
+predictiondog1
+
+table(predictiondog, testdog$AdoptionSpeed)
+table(predictiondog1, testdog1$AdoptionSpeed)
+
+mean(as.character(predictiondog) != as.character(testdog$AdoptionSpeed))
+mean(as.character(predictiondog1) != as.character(testdog1$AdoptionSpeed))
+
+QDogs<-data.frame(dog_valiation_data$PetID,predictiondog,dog_valiation_data$AdoptionSpeed)
+QDogs
+write.csv(QDogs, "~/Desktop/petfinder-adoption-prediction/all/Qdogs.csv")
+
+QQDogs<-data.frame(dog_test_data$PetID,predictiondog1,dog_test_data$AdoptionSpeed)
+QQDogs
+write.csv(QQDogs, "~/Desktop/petfinder-adoption-prediction/all/QQdogs.csv")
+
+```
+
